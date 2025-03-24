@@ -24,8 +24,8 @@ import (
 
 	ccipsolana "github.com/smartcontractkit/chainlink-ccip/chains/solana"
 	idl "github.com/smartcontractkit/chainlink-ccip/chains/solana"
+	"github.com/smartcontractkit/chainlink-ccip/chains/solana/gobindings/ccip_common"
 	"github.com/smartcontractkit/chainlink-ccip/chains/solana/gobindings/ccip_offramp"
-	"github.com/smartcontractkit/chainlink-ccip/chains/solana/gobindings/ccip_router"
 	ccipconsts "github.com/smartcontractkit/chainlink-ccip/pkg/consts"
 	"github.com/smartcontractkit/chainlink-ccip/pkg/types/ccipocr3"
 
@@ -46,7 +46,7 @@ type Arguments struct {
 }
 
 var ccipOfframpIDL = idl.FetchCCIPOfframpIDL()
-var ccipRouterIDL = idl.FetchCCIPRouterIDL()
+var ccipCommonIDL = idl.FetchCommonIDL()
 var testContractIDL = chainwriter.FetchTestContractIDL()
 
 func TestChainWriter_GetAddresses(t *testing.T) {
@@ -818,8 +818,8 @@ func TestChainWriter_CCIPOfframp(t *testing.T) {
 											InternalField: chainwriter.InternalField{
 												TypeName: "TokenAdminRegistry",
 												Location: "LookupTable",
-												// TokenAdminRegistry is in the router program so need to provide the router's IDL
-												IDL: ccipRouterIDL,
+												// TokenAdminRegistry is defined in the ccip common module so need to provide common's IDL
+												IDL: ccipCommonIDL,
 											},
 										},
 									},
@@ -1151,7 +1151,7 @@ func mockDataAccountLookupTable(t *testing.T, rw *clientmocks.ReaderWriter, pda 
 
 func mockTokenAdminRegistryLookupTable(t *testing.T, rw *clientmocks.ReaderWriter, pda solana.PublicKey) solana.PublicKey {
 	lookupTablePubkey := utils.GetRandomPubKey(t)
-	tokenAdminRegistry := ccip_router.TokenAdminRegistry{
+	tokenAdminRegistry := ccip_common.TokenAdminRegistry{
 		Version:              1,
 		Administrator:        utils.GetRandomPubKey(t),
 		PendingAdministrator: utils.GetRandomPubKey(t),
