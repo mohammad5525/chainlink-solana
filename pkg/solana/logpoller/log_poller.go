@@ -253,7 +253,7 @@ func (lp *Service) UnregisterFilter(ctx context.Context, name string) error {
 // LogPoller run loop it will backfill all filters starting from fromBlock. If there
 // are new filters in the backfill queue, with an earlier StartingBlock, then they
 // will get backfilled from there instead.
-func (lp *Service) Replay(fromBlock int64) error {
+func (lp *Service) Replay(fromBlock int64) {
 	lp.replay.mut.Lock()
 	defer lp.replay.mut.Unlock()
 
@@ -261,15 +261,13 @@ func (lp *Service) Replay(fromBlock int64) error {
 		// Already requested, no further action required
 		lp.lggr.Warnf("Ignoring redundant request to replay from block %d, replay from block %d already requested",
 			fromBlock, lp.replay.requestBlock)
-		return nil
+		return
 	}
 	lp.filters.UpdateStartingBlocks(fromBlock)
 	lp.replay.requestBlock = fromBlock
 	if lp.replay.status != ReplayStatusPending {
 		lp.replay.status = ReplayStatusRequested
 	}
-
-	return nil
 }
 
 // ReplayStatus returns the current replay status of LogPoller:
